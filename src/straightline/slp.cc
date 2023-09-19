@@ -4,26 +4,29 @@
 
 namespace A {
 int A::CompoundStm::MaxArgs() const {
-  return std::max(stm1->MaxArgs(), stm2->MaxArgs());
+  return std::max(this->stm1->MaxArgs(), this->stm2->MaxArgs());
 }
 
 Table *A::CompoundStm::Interp(Table *t) const {
-  return stm2->Interp(stm1->Interp(t)); // first update stm1 then stm2
+  return this->stm2->Interp(
+      this->stm1->Interp(t)); // first update stm1 then stm2
 }
 
-int A::AssignStm::MaxArgs() const { return exp->MaxArgs(); }
+int A::AssignStm::MaxArgs() const { return this->exp->MaxArgs(); }
 
 Table *A::AssignStm::Interp(Table *t) const {
-  // TODO: put your code here (lab1).
   IntAndTable *intAndTable = exp->InterpExp(t);
   Table *tableToUpdate = intAndTable->t;
   int newVal = intAndTable->i; // new value for id to assign
-  Table *updatedTable = tableToUpdate->Update(id, newVal); // new val from front
+  Table *updatedTable =
+      tableToUpdate->Update(this->id, newVal); // new val from front
   return updatedTable;
 }
 
-int A::PrintStm::MaxArgs() const { return exps->MaxArgs(); }
-Table *A::PrintStm::Interp(Table *t) const { return exps->InterpExp(t)->t; }
+int A::PrintStm::MaxArgs() const { return this->exps->MaxArgs(); }
+Table *A::PrintStm::Interp(Table *t) const {
+  return this->exps->InterpExp(t)->t;
+}
 
 int A::NumExp::MaxArgs() const { return 1; }
 IntAndTable *A::NumExp::InterpExp(Table *t) const {
@@ -37,9 +40,9 @@ IntAndTable *A::IdExp::InterpExp(Table *t) const {
 
 int A::OpExp::MaxArgs() const { return 1; }
 IntAndTable *A::OpExp::InterpExp(Table *t) const {
-  IntAndTable *leftAndTable = left->InterpExp(t);
-  IntAndTable *rightAndTable = right->InterpExp(leftAndTable->t);
-  switch (oper) {
+  IntAndTable *leftAndTable = this->left->InterpExp(t);
+  IntAndTable *rightAndTable = this->right->InterpExp(leftAndTable->t);
+  switch (this->oper) {
   case PLUS:
     return new IntAndTable(leftAndTable->i + rightAndTable->i,
                            rightAndTable->t);
@@ -59,18 +62,19 @@ IntAndTable *A::OpExp::InterpExp(Table *t) const {
 
 // like compoundStm (stm, exp)
 int A::EseqExp::MaxArgs() const {
-  return std::max(stm->MaxArgs(), exp->MaxArgs());
+  return std::max(this->stm->MaxArgs(), this->exp->MaxArgs());
 }
 IntAndTable *A::EseqExp::InterpExp(Table *t) const {
-  return exp->InterpExp(stm->Interp(t)); // first stm then expression
+  return this->exp->InterpExp(
+      this->stm->Interp(t)); // first stm then expression
 }
 
-// or 1 cause exp->MaxArgs() = 1
-int A::PairExpList::MaxArgs() const { return exp->MaxArgs() + tail->MaxArgs(); }
+// or 1, cause exp->MaxArgs() = 1
+int A::PairExpList::MaxArgs() const { return 1 + this->tail->MaxArgs(); }
 IntAndTable *A::PairExpList::InterpExp(Table *t) const {
-  IntAndTable *lastExpAndTable = exp->InterpExp(t);
-  printf("%d ", lastExpAndTable->i);
-  return tail->InterpExp(lastExpAndTable->t);
+  IntAndTable *expAndTable = this->exp->InterpExp(t);
+  printf("%d ", expAndTable->i);
+  return this->tail->InterpExp(expAndTable->t);
 }
 int A::LastExpList::MaxArgs() const { return exp->MaxArgs(); }
 IntAndTable *A::LastExpList::InterpExp(Table *t) const { // need to print
