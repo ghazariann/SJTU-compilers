@@ -73,8 +73,14 @@
     // here first and third \ are for escaping second and fourth (\ and ") lex charecters
     \\\"  {adjustStr(); string_buf_ += '\"'; } // escape * in string, see test 52
     \\\\  {adjustStr(); string_buf_ += '\\'; } // escape \ in stirng 
+    \\[0-9]{3}      {adjustStr(); string_buf_ += (char)atoi(matched().c_str() + 1); } // recognize ascii charecter
+    \\[ \n\t\f]+\\  {adjustStr(); }
+    \\\^[A-Z]       {adjustStr(); string_buf_ += matched()[2] - 'A' + 1; }
     .     {adjustStr(); string_buf_ += matched(); }
 }
 
- // Error handling 
+// End of file handling
+<<EOF>>  return 0;
+
+// Error handling 
 . {adjust(); errormsg_->Error(errormsg_->tok_pos_, "illegal token");}
