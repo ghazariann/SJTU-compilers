@@ -73,9 +73,9 @@
     // here first and third \ are for escaping second and fourth (\ and ") lex charecters
     \\\"  {adjustStr(); string_buf_ += '\"'; } // escape * in string, see test 52
     \\\\  {adjustStr(); string_buf_ += '\\'; } // escape \ in stirng 
-    \\[0-9]{3}      {adjustStr(); string_buf_ += (char)atoi(matched().c_str() + 1); } // recognize ascii charecter
-    \\[ \n\t\f]+\\  {adjustStr(); }
-    \\\^[A-Z]       {adjustStr(); string_buf_ += matched()[2] - 'A' + 1; }
+    \\[0-9]{3}      {adjustStr(); string_buf_ += (char)atoi(matched().c_str() + 1); } // recognize ascii charecter, +1 skips \
+    \\[ \f\n\t]+\\  {adjustStr(); } // ignore \           \  (dont add to buffer)
+    \\\^[A-Z]       {adjustStr(); string_buf_ += matched()[2] - 'A' + 1; } // handle control strings, ^C = ASCII 3 = End of Text
     .     {adjustStr(); string_buf_ += matched(); }
 }
 
