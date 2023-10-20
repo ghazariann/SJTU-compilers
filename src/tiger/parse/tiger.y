@@ -85,15 +85,11 @@ ifExp:
   IF exp THEN exp {$$ = new absyn::IfExp(scanner_.GetTokPos(), $2, $4, nullptr);} |                                 // no else 
   IF LPAREN exp RPAREN THEN exp {$$ = new absyn::IfExp(scanner_.GetTokPos(), $3, $6, nullptr);} |                   // with () no else
   IF exp THEN exp ELSE exp {$$ = new absyn::IfExp(scanner_.GetTokPos(), $2, $4, $6);} |                             // with else 
-  IF LPAREN exp RPAREN THEN exp ELSE exp {$$ = new absyn::IfExp(scanner_.GetTokPos(), $3, $6, $8);} |               // with () and else
-  exp AND exp {$$ = new absyn::IfExp(scanner_.GetTokPos(), $1, $3, new absyn::IntExp(scanner_.GetTokPos(), 0));} |  // check a then b else 0 
-  exp OR exp {$$ = new absyn::IfExp(scanner_.GetTokPos(), $1, new absyn::IntExp(scanner_.GetTokPos(), 1), $3);};    // check a then 1 else check b
+  IF LPAREN exp RPAREN THEN exp ELSE exp {$$ = new absyn::IfExp(scanner_.GetTokPos(), $3, $6, $8);};               // with () and else
 
 whileExp:
   WHILE exp DO exp {$$ = new absyn::WhileExp(scanner_.GetTokPos(), $2, $4);} |                                      // without ()
   WHILE LPAREN exp RPAREN DO exp {$$ = new absyn::WhileExp(scanner_.GetTokPos(), $3, $6);};                         // with ()
-  // exp AND exp {$$ = new absyn::WhileExp(scanner_.GetTokPos(), $1, $3, new absyn::IntExp(scanner_.GetTokPos(), 0));} |  // check a then b else 0 
-  // exp OR exp {$$ = new absyn::WhileExp(scanner_.GetTokPos(), $1, new absyn::IntExp(scanner_.GetTokPos(), 1), $3);};    // check a then 1 else check b
 
 callExp:
   ID LPAREN RPAREN {$$ = new absyn::CallExp(scanner_.GetTokPos(), $1, new absyn::ExpList());} |                     // no param
