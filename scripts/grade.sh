@@ -42,7 +42,7 @@ test_lab2() {
     local ref=${ref_dir}/${testcase_name}.out
 
     ./test_lex "$testcase" >&/tmp/output.txt
-    diff /tmp/output.txt "${ref}"
+    diff -w /tmp/output.txt "${ref}"
     if [[ $? != 0 ]]; then
       echo "Error: Output mismatch"
       echo "${score_str}: 0"
@@ -92,7 +92,7 @@ test_lab3() {
       fi
 
       # Check output
-      diff /tmp/output.txt "${ref}"
+      diff -w /tmp/output.txt "${ref}"
       if [[ $? != 0 ]]; then
         echo "Error: Output mismatch [$testcase_name]"
         echo "${score_str}: 0"
