@@ -1,4 +1,4 @@
-.PHONY: docker-build docker-pull docker-run docker-run-backend transform build gradelab1 gradelab2 gradelab3 gradelab4 gradelab5 gradelab6 gradeall clean register format
+.PHONY: docker-build docker-pull docker-run docker-run-backend transform build gradelab1 gradelab2 gradelab3 gradelab4 gradelab5-1 gradelab5-2 gradelab6 gradeall clean register format
 
 docker-build:
 	docker build -t ipadsse302/tigerlabs_env .
@@ -38,8 +38,8 @@ gradelab4:transform
 gradelab5-1:transform
 	bash scripts/grade.sh lab5-part1
 
-gradelab5:transform
-	bash scripts/grade.sh lab5
+gradelab5-2:transform
+	bash scripts/grade.sh lab5-part2
 
 gradelab6:transform
 	bash scripts/grade.sh lab6
