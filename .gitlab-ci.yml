@@ -56,7 +56,7 @@ test_lab5_part2:
   script:
     - rm -rf scripts testdata
     - cp -r /home/stu/upload.py /home/stu/scripts /home/stu/testdata .
-    - make gradelab5-2 | tee output.log
+    - make gradelab5 | tee output.log
 # 
 # test_lab6:
 #  image: ipadsse302/tigerlabs_score_env
