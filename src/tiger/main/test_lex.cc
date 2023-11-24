@@ -58,7 +58,6 @@ int main(int argc, char **argv) {
     fprintf(stderr, "usage: a.out filename\n");
     exit(1);
   }
-
   Scanner scanner(argv[1]);
 
   while (int tok = scanner.lex()) {
