@@ -4,11 +4,11 @@
 #include <list>
 #include <memory>
 #include <string>
+#include <vector>
 
+#include "tiger/codegen/assem.h"
 #include "tiger/frame/temp.h"
 #include "tiger/translate/tree.h"
-#include "tiger/codegen/assem.h"
-
 
 namespace frame {
 
@@ -63,21 +63,61 @@ public:
 
   [[nodiscard]] virtual temp::Temp *ReturnValue() = 0;
 
+  [[nodiscard]] virtual temp::Temp *GetArithmeticRegister() = 0;
+  [[nodiscard]] virtual temp::Temp *ProgramCounter() = 0;
+
   temp::Map *temp_map_;
+
 protected:
   std::vector<temp::Temp *> regs_;
 };
 
+class Frame;
 class Access {
 public:
   /* TODO: Put your lab5 code here */
-  
+  virtual std::string ConsumeAccess(Frame *frame) = 0;
   virtual ~Access() = default;
-  
 };
 
 class Frame {
-  /* TODO: Put your lab5 code here */
+protected:
+  Frame() = default;
+  explicit Frame(temp::Label *frameLabel)
+      : frameLabel_(frameLabel), localVariableCount_(0),
+        maxOutgoingArguments_(0) {}
+
+  virtual ~Frame() = default;
+  // Word size is machine dependent and initialized in subclass
+  int wordSize_;
+
+public:
+  // Get the word size for the frame
+  virtual int GetWordSize() const = 0;
+  // Get the label associated with the frame
+  virtual std::string GetFrameLabel() const = 0;
+  // Allocate a new local variable in the frame
+  virtual Access *AllocateLocal(bool escapes) = 0;
+  // Get the address expression of the frame
+  virtual tree::Exp *GetFrameAddress() const = 0;
+
+  // Get the stack offset expression for a given frame offset
+  virtual tree::Exp *GetStackOffset(int frameOffset) const = 0;
+  // Label for the frame
+  temp::Label *frameLabel_;
+  std::vector<Access *> formalAccesses_;
+  std::vector<Access *> localAccesses_;
+  int localVariableCount_;
+  // Label for the frame size, altered when frame size is known
+  temp::Label *frameSizeLabel_;
+  // Statement for view shift operations
+  tree::Stm *viewShiftStatement;
+  // Statement for saving callee-saved registers
+  tree::Stm *saveCalleeSavesStatement;
+  // Statement for restoring callee-saved registers
+  tree::Stm *restoreCalleeSavesStatement;
+  // Maximum number of outgoing arguments in any call within the frame
+  int maxOutgoingArguments_;
 };
 
 /**
@@ -97,7 +137,8 @@ public:
    *Generate assembly for main program
    * @param out FILE object for output assembly file
    */
-  virtual void OutputAssem(FILE *out, OutputPhase phase, bool need_ra) const = 0;
+  virtual void OutputAssem(FILE *out, OutputPhase phase,
+                           bool need_ra) const = 0;
 };
 
 class StringFrag : public Frag {
@@ -125,13 +166,11 @@ class Frags {
 public:
   Frags() = default;
   void PushBack(Frag *frag) { frags_.emplace_back(frag); }
-  const std::list<Frag*> &GetList() { return frags_; }
+  const std::list<Frag *> &GetList() { return frags_; }
 
 private:
-  std::list<Frag*> frags_;
+  std::list<Frag *> frags_;
 };
-
-/* TODO: Put your lab5 code here */
 
 } // namespace frame
 

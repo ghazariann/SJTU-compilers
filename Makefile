@@ -59,4 +59,3 @@ register:
 
 format:
 	find . \( -name "*.h" -o -iname "*.cc" \) | xargs clang-format -i -style=file
-

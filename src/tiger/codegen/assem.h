@@ -73,8 +73,16 @@ public:
   void Print(FILE *out, temp::Map *m) const;
   void Append(assem::Instr *instr) { instr_list_.push_back(instr); }
   void Remove(assem::Instr *instr) { instr_list_.remove(instr); }
+  void Erase(std::list<Instr *>::const_iterator pos) { instr_list_.erase(pos); }
   void Insert(std::list<Instr *>::const_iterator pos, assem::Instr *instr) {
     instr_list_.insert(pos, instr);
+  }
+  std::list<Instr *>::const_iterator
+  Replace(std::list<Instr *>::const_iterator pos, assem::Instr *instr) {
+    instr_list_.insert(pos, instr);
+    pos = instr_list_.erase(pos);
+    pos--;
+    return pos;
   }
   [[nodiscard]] const std::list<Instr *> &GetList() const {
     return instr_list_;
@@ -92,6 +100,16 @@ public:
 
   Proc(std::string prolog, InstrList *body, std::string epilog)
       : prolog_(std::move(prolog)), body_(body), epilog_(std::move(epilog)) {}
+};
+
+class MemFetch {
+public:
+  std::string fetch_;
+  temp::TempList *regs_;
+
+  MemFetch() { regs_ = new temp::TempList(); }
+  MemFetch(std::string fetch, temp::TempList *regs)
+      : fetch_(fetch), regs_(regs) {}
 };
 
 } // namespace assem
