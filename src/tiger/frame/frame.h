@@ -63,7 +63,9 @@ public:
 
   [[nodiscard]] virtual temp::Temp *ReturnValue() = 0;
 
-  [[nodiscard]] virtual int RegisterCount() = 0;
+  [[nodiscard]] virtual temp::Temp *GetArithmeticRegister() = 0;
+  [[nodiscard]] virtual temp::Temp *ProgramCounter() = 0;
+
   temp::Map *temp_map_;
 
 protected:

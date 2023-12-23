@@ -20,18 +20,19 @@ public:
   temp::Temp *FramePointer() override;
   temp::Temp *StackPointer() override;
   temp::Temp *ReturnValue() override;
+  temp::Temp *GetArithmeticRegister() override;
+  temp::Temp *ProgramCounter() override;
   int WordSize() override;
-  int RegisterCount() override;
 
   enum Register {
-    RSP,
-    RBP,
     RAX,
     RBX,
     RCX,
     RDX,
     RSI,
     RDI,
+    RBP,
+    RSP,
     R8,
     R9,
     R10,
@@ -40,6 +41,7 @@ public:
     R13,
     R14,
     R15,
+    RIP,
     REG_COUNT,
   };
 
@@ -50,6 +52,26 @@ private:
 };
 
 Frame *NewFrame(temp::Label *name, std::vector<bool> formals);
-tree::Stm *ProcEntryExit1(Frame *frame, tree::Stm *stm);
+tree::Exp *GetCurrentAccessExpression(Access *acc, Frame *frame);
+tree::Exp *GetAccessExpression(Access *acc, tree::Exp *fp);
+// Function to create an expression for an external function call
+tree::Exp *CreateExternalFunctionCall(std::string functionName,
+                                      tree::ExpList *arguments);
+
+// Function to generate the entry and exit sequence for a procedure's body
+// statement
+tree::Stm *GenerateProcedureEntryExitSequence(Frame *currentFrame,
+                                              tree::Stm *procedureBody);
+
+// Function to prepare the instruction list for a procedure with necessary
+// pre-return processing
+assem::InstrList *
+PrepareProcedureInstructions(assem::InstrList *procedureInstructions);
+
+// Function to construct the complete procedure with prologue and epilogue
+assem::Proc *
+BuildCompleteProcedure(Frame *procedureFrame,
+                       assem::InstrList *procedureBodyInstructions);
+
 } // namespace frame
 #endif // TIGER_COMPILER_X64FRAME_H

@@ -30,7 +30,15 @@ public:
     }
     return ret;
   }
-
+  bool IsEmpty() const { return patch_list_.empty(); }
+  temp::Label **GetFront() const {
+    if (!patch_list_.empty()) {
+      return patch_list_.front();
+    }
+    return nullptr;
+  }
+  // Method to add a label pointer to the patch list
+  // void AddLabel(temp::Label **labelPtr) { patch_list_.push_back(labelPtr); }
   explicit PatchList(std::list<temp::Label **> patch_list)
       : patch_list_(patch_list) {}
   PatchList() = default;
@@ -100,7 +108,7 @@ private:
   void FillBaseVEnv();
   void FillBaseTEnv();
 };
-
+void ProcEntryExit(Level *level, Exp *body);
 } // namespace tr
 
 #endif
