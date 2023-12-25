@@ -19,18 +19,11 @@ class Level;
 class PatchList {
 public:
   void DoPatch(temp::Label *label) {
-    for (auto &patch : patch_list_)
+    for (auto &patch : patch_list_) {
+      // if (*patch == nullptr)
       *patch = label;
-  }
-
-  static PatchList JoinPatch(const PatchList &first, const PatchList &second) {
-    PatchList ret(first.GetList());
-    for (auto &patch : second.patch_list_) {
-      ret.patch_list_.push_back(patch);
     }
-    return ret;
   }
-  bool IsEmpty() const { return patch_list_.empty(); }
   temp::Label **GetFront() const {
     if (!patch_list_.empty()) {
       return patch_list_.front();

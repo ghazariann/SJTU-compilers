@@ -390,7 +390,7 @@ tr::ExpAndTy *OpExp::Translate(env::VEnvPtr venv, env::TEnvPtr tenv,
   tree::Exp *leftExpression = leftExpressionType->exp_->UnEx();
   tree::Exp *rightExpression = rightExpressionType->exp_->UnEx();
 
-  if (oper_ == absyn::AND_OP || oper_ == absyn::OR_OP) {
+  if (oper_ == absyn::AND_OP) {
     tr::Cx conditionalExp = leftExpressionType->exp_->UnCx(errormsg);
     tr::ExpAndTy *falseExpressionType = new tr::ExpAndTy(
         new tr::ExExp(new tree::ConstExp(0)), type::IntTy::Instance());
@@ -404,8 +404,7 @@ tr::ExpAndTy *OpExp::Translate(env::VEnvPtr venv, env::TEnvPtr tenv,
         new tree::EseqExp(
             new tree::LabelStm(*(conditionalExp.trues_.GetFront())),
             new tree::EseqExp(
-                new tree::MoveStm(resultRegisterExp,
-                                  rightExpressionType->exp_->UnEx()),
+                new tree::MoveStm(resultRegisterExp, rightExpression),
                 new tree::EseqExp(
                     new tree::JumpStm(new tree::NameExp(convergenceLabel),
                                       convergenceJumps),
@@ -423,6 +422,39 @@ tr::ExpAndTy *OpExp::Translate(env::VEnvPtr venv, env::TEnvPtr tenv,
                             rightExpressionType->ty_);
   }
 
+  if (oper_ == absyn::OR_OP) {
+    tr::Cx conditionalExp = leftExpressionType->exp_->UnCx(errormsg);
+    tr::ExpAndTy *falseExpressionType = new tr::ExpAndTy(
+        new tr::ExExp(new tree::ConstExp(1)), type::IntTy::Instance());
+    temp::Label *convergenceLabel = temp::LabelFactory::NewLabel();
+    std::vector<temp::Label *> *convergenceJumps =
+        new std::vector<temp::Label *>{convergenceLabel};
+    temp::Temp *resultRegister = temp::TempFactory::NewTemp();
+    tree::Exp *resultRegisterExp = new tree::TempExp(resultRegister);
+    tree::Exp *conditionalExpression = new tree::EseqExp(
+        conditionalExp.stm_,
+        new tree::EseqExp(
+            new tree::LabelStm(*(conditionalExp.trues_.GetFront())),
+            new tree::EseqExp(
+                new tree::MoveStm(
+                    resultRegisterExp,
+                    falseExpressionType->exp_->UnEx()), // represents 1
+                new tree::EseqExp(
+                    new tree::JumpStm(new tree::NameExp(convergenceLabel),
+                                      convergenceJumps),
+                    new tree::EseqExp(
+                        new tree::LabelStm(
+                            *(conditionalExp.falses_.GetFront())),
+                        new tree::EseqExp(
+                            new tree::MoveStm(
+                                resultRegisterExp,
+                                rightExpression), //  falseExpressionType->exp_->UnEx()
+                            new tree::EseqExp(
+                                new tree::LabelStm(convergenceLabel),
+                                resultRegisterExp)))))));
+    return new tr::ExpAndTy(new tr::ExExp(conditionalExpression),
+                            falseExpressionType->ty_);
+  }
   tree::CjumpStm *conditionalJumpStatement;
   tr::Exp *finalExpression;
 
