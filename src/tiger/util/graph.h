@@ -1,7 +1,13 @@
 #ifndef TIGER_UTIL_GRAPH_H_
 #define TIGER_UTIL_GRAPH_H_
 
+#include "tiger/frame/temp.h"
 #include "tiger/util/table.h"
+
+#include <iostream>
+#include <list>
+#include <set>
+#include <unordered_map>
 
 namespace graph {
 
@@ -17,27 +23,56 @@ public:
   NodeList<T> *Nodes();
 
   // Make a new node in graph "g", with associated "info_"
-  Node<T> *NewNode(T *info);
+  virtual Node<T> *NewNode(T *info);
 
   // Make a new edge joining nodes "from" and "to", which must belong
   // to the same graph
-  void AddEdge(Node<T> *from, Node<T> *to);
+  virtual void AddEdge(Node<T> *from, Node<T> *to);
 
   // Show all the nodes and edges in the graph, using the function "show_info"
   // to print the name of each node
   static void Show(FILE *out, NodeList<T> *p,
                    std::function<void(T *)> show_info);
 
+  virtual void SetNodeDegree(Node<temp::Temp> *n, int d) {}
+  virtual int GetNodeDegree(Node<T> *n) { return n->Degree(); }
+  virtual void IncrementDegree(Node<T> *n) {}
+  virtual void DecrementDegree(Node<T> *n) {}
+
   int nodecount_;
 
   ~Graph();
 
-private:
+protected:
   NodeList<T> *my_nodes_;
+};
+
+class IGraph : public Graph<temp::Temp> {
+public:
+  IGraph(temp::TempList *precolored)
+      : Graph<temp::Temp>(), precolored_(precolored) {}
+
+  bool IsAdjacent(Node<temp::Temp> *n, Node<temp::Temp> *m);
+
+  Node<temp::Temp> *NewNode(temp::Temp *info) override;
+  void AddEdge(Node<temp::Temp> *from, Node<temp::Temp> *to) override;
+
+  void SetNodeDegree(Node<temp::Temp> *n, int d) override;
+  int GetNodeDegree(Node<temp::Temp> *n) override;
+  void IncrementDegree(Node<temp::Temp> *n) override;
+  void DecrementDegree(Node<temp::Temp> *n) override;
+
+  void ClearAllEdges();
+
+private:
+  temp::TempList *precolored_;
+  std::set<std::pair<Node<temp::Temp> *, Node<temp::Temp> *>> adj_set_;
+  std::unordered_map<Node<temp::Temp> *, int> degree_;
 };
 
 template <typename T> class Node {
   template <typename NodeType> friend class Graph;
+  friend class IGraph;
 
 public:
   // Tell if there is an edge from this node to "n"
@@ -61,8 +96,15 @@ public:
   // Get all the predecessors of node
   NodeList<T> *Pred();
 
+  NodeList<T> *AdjacentList();
   // Tell how many edges lead to or from node
   int Degree();
+
+  int GetIDegree();
+
+  void IncrementIDegree();
+
+  void DecrementIDegree();
 
   // Get the "info_" associated with node
   T *NodeInfo();
@@ -90,10 +132,13 @@ private:
 template <typename T> class NodeList {
   friend class Graph<T>;
   friend class Node<T>;
+  friend class IGraph;
+  friend class INode;
 
 public:
   // Make a NodeList
   NodeList<T>() = default;
+  explicit NodeList<T>(Node<T> *n) : node_list_({n}) {}
   ~NodeList<T>() = default;
 
   // Tell if "a" is in the list
@@ -169,6 +214,17 @@ template <typename T> int Node<T>::OutDegree() {
 
 template <typename T> int Node<T>::Degree() { return InDegree() + OutDegree(); }
 
+template <typename T> void Node<T>::IncrementIDegree() {
+  my_graph_->IncrementDegree(this);
+}
+
+template <typename T> void Node<T>::DecrementIDegree() {
+  my_graph_->DecrementDegree(this);
+}
+template <typename T> int Node<T>::GetIDegree() {
+  return my_graph_->GetNodeDegree(this);
+}
+
 template <typename T> NodeList<T> *Node<T>::Adj() {
   NodeList<T> *adj_list = new NodeList<T>();
   adj_list->CatList(succs_);
@@ -179,6 +235,10 @@ template <typename T> NodeList<T> *Node<T>::Adj() {
 template <typename T> NodeList<T> *Node<T>::Succ() { return succs_; }
 
 template <typename T> NodeList<T> *Node<T>::Pred() { return preds_; }
+
+template <typename T> NodeList<T> *Node<T>::AdjacentList() {
+  return succs_->Union(preds_);
+}
 
 template <typename T> T *Node<T>::NodeInfo() { return info_; }
 
@@ -215,12 +275,10 @@ template <typename T> void NodeList<T>::CatList(NodeList<T> *nl) {
 
 template <typename T> NodeList<T> *NodeList<T>::Union(NodeList<T> *nl) {
   NodeList<T> *res = new NodeList<T>();
-  for (auto node : node_list_) {
-    res->Append(node);
-  }
-  for (auto node : nl->GetList()) {
-    if (!res->Contain(node))
-      res->Append(node);
+  res->CatList(this);
+  for (auto temp : nl->GetList()) {
+    if (!res->Contain(temp))
+      res->Append(temp);
   }
   return res;
 }

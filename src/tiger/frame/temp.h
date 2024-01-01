@@ -68,6 +68,15 @@ public:
   [[nodiscard]] Temp *NthTemp(int i) const;
   [[nodiscard]] const std::list<Temp *> &GetList() const { return temp_list_; }
 
+  bool ContainsElement(const Temp *element) const;
+  void AppendTempList(const TempList *tempList);
+  TempList *CreateUnionWithList(const TempList *otherList) const;
+  TempList *CreateDifferenceWithList(const TempList *otherList) const;
+  bool IsIdenticalToList(const TempList *otherList) const;
+  std::list<Temp *>::const_iterator
+  ReplaceElementAtIterator(std::list<Temp *>::const_iterator position,
+                           Temp *newElement);
+
 private:
   std::list<Temp *> temp_list_;
 };
