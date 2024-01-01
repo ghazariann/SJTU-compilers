@@ -12,9 +12,7 @@ std::unordered_map<X64RegManager::Register, std::string>
             {RBP, "%rbp"}, {RSP, "%rsp"}, {RAX, "%rax"}, {RBX, "%rbx"},
             {RCX, "%rcx"}, {RDX, "%rdx"}, {RSI, "%rsi"}, {RDI, "%rdi"},
             {R8, "%r8"},   {R9, "%r9"},   {R10, "%r10"}, {R11, "%r11"},
-            {R12, "%r12"}, {R13, "%r13"}, {R14, "%r14"}, {R15, "%r15"},
-            {RIP, "%rip"},
-        };
+            {R12, "%r12"}, {R13, "%r13"}, {R14, "%r14"}, {R15, "%r15"}};
 
 X64RegManager::X64RegManager() {
   //
@@ -46,12 +44,9 @@ temp::TempList *X64RegManager::ArgRegs() {
 }
 
 temp::TempList *X64RegManager::CallerSaves() {
-  temp::TempList *CallerSavesRegisters = new temp::TempList({
-      regs_.at(RAX),
-      regs_.at(RSP),
-      regs_.at(R10),
-      regs_.at(R11),
-  });
+  temp::TempList *CallerSavesRegisters = new temp::TempList(
+      {regs_.at(RAX), regs_.at(R8), regs_.at(R9), regs_.at(R10), regs_.at(R11),
+       regs_.at(RDI), regs_.at(RSI), regs_.at(RDX), regs_.at(RCX)});
   return CallerSavesRegisters;
 }
 
@@ -81,9 +76,8 @@ temp::Temp *X64RegManager::StackPointer() { return regs_.at(RSP); }
 temp::Temp *X64RegManager::ReturnValue() { return regs_.at(RAX); }
 
 int X64RegManager::WordSize() { return WORD_SIZE; }
-
+int X64RegManager::RegisterCount() { return REG_COUNT; }
 temp::Temp *X64RegManager::GetArithmeticRegister() { return regs_.at(RDX); }
-temp::Temp *X64RegManager::ProgramCounter() { return regs_.at(RIP); }
 
 class InFrameAccess : public Access {
 public:

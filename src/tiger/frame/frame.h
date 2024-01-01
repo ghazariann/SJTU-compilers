@@ -56,6 +56,7 @@ public:
    * Get word size
    */
   [[nodiscard]] virtual int WordSize() = 0;
+  [[nodiscard]] virtual int RegisterCount() = 0;
 
   [[nodiscard]] virtual temp::Temp *FramePointer() = 0;
 
@@ -64,7 +65,6 @@ public:
   [[nodiscard]] virtual temp::Temp *ReturnValue() = 0;
 
   [[nodiscard]] virtual temp::Temp *GetArithmeticRegister() = 0;
-  [[nodiscard]] virtual temp::Temp *ProgramCounter() = 0;
 
   temp::Map *temp_map_;
 

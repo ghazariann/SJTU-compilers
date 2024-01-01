@@ -21,8 +21,8 @@ public:
   temp::Temp *StackPointer() override;
   temp::Temp *ReturnValue() override;
   temp::Temp *GetArithmeticRegister() override;
-  temp::Temp *ProgramCounter() override;
   int WordSize() override;
+  int RegisterCount() override;
 
   enum Register {
     RAX,
@@ -41,7 +41,6 @@ public:
     R13,
     R14,
     R15,
-    RIP,
     REG_COUNT,
   };
 
