@@ -36,11 +36,7 @@ test_lab4:
     - rm -rf scripts testdata
     - cp -r /home/stu/upload.py /home/stu/scripts /home/stu/testdata .
     - make gradelab4 | tee output.log
-<<<<<<< HEAD
- 
-=======
-#
->>>>>>> lab5-part2
+
 test_lab5_part1:
   image: ipadsse302/tigerlabs_score_env
   tags:
@@ -60,7 +56,6 @@ test_lab5_part2:
     - rm -rf scripts testdata
     - cp -r /home/stu/upload.py /home/stu/scripts /home/stu/testdata .
     - make gradelab5 | tee output.log
-<<<<<<< HEAD
 
 test_lab6:
   image: ipadsse302/tigerlabs_score_env
