@@ -18,7 +18,7 @@ In the SE3355 Compilers course, I have developed a complete compiler for the Tig
 
 - For each lab, tests are provided along with the source code.
 - All tests for all labs have been successfully passed.
-- For detailed setup and testing instructions, please refer to [docs/Readme.md](./docs/Readme.md) in this repository.
+- For detailed setup and testing instructions, please refer to [docs/Readme.md](docs/README.md) in this repository.
 - For specific requirements of each lab please refer to [docs/labX.pdf](/docs)
 
 ## Acknowledgements
